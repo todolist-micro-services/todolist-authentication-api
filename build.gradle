@@ -14,6 +14,7 @@ java {
 
 repositories {
 	mavenCentral()
+	mavenLocal()
 }
 
 dependencies {
@@ -24,6 +25,8 @@ dependencies {
 	// tag::tests[]
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	// end::tests[]
+	implementation(files("libs/app-1.0-SNAPSHOT.jar"))
+	implementation('mysql:mysql-connector-java:8.0.28')
 }
 
 tasks.named('test') {
