@@ -25,8 +25,12 @@ dependencies {
 	// tag::tests[]
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	// end::tests[]
-	implementation(files("libs/app-1.0-SNAPSHOT.jar"))
+	implementation(files("libs/dataInterface.jar"))
+	implementation(files("libs/jwtToken.jar"))
 	implementation('mysql:mysql-connector-java:8.0.28')
+	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+	implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
 }
 
 tasks.named('test') {
