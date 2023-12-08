@@ -10,10 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import todolist.database.DataInterface;
-import todolist.database.dataType.Token;
 import todolist.database.dataType.User;
+import todolist.database.dataType.Token;
 import todolist.jwttoken.JwtToken;
 import todolist.jwttoken.JwtTokenType;
+import todolist.database.mysql.Mysql;
 
 import java.time.LocalDateTime;
 
@@ -49,8 +50,7 @@ public class RegisterController {
         String secret = "asdfSFS34wfsdfsdfSDSD32dfsddDDerQSNCK34SOWEK5354fdgdf4";
         int nbrHour = 24;
         JwtTokenType token = JwtToken.createJwtToken(secret, name, email, name, nbrHour);
-        System.out.println(token);
-        Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate());
+        Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate(), false);
         dataInterface.createUserToken(dbToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
     }
