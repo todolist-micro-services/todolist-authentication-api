@@ -3,6 +3,8 @@ package com.funnyproject.todolistauthentificationapi.register;
 import com.funnyproject.todolistauthentificationapi.utils.EmailValidator;
 import com.funnyproject.todolistauthentificationapi.utils.HashPassword;
 import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
+import com.funnyproject.todolistauthentificationapi.utils.SendEmail;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,6 +73,11 @@ public class RegisterController {
         final Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate(), false);
         if (!dataInterface.createUserToken(dbToken).isEmpty())
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+        try {
+            emailService.sendEmail(email, "Account validation - todolist-micro-service", "http://localhost:8081/auth/validation/" + token.getJwtValue());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error - cannot send email\"}");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
     }
 
@@ -98,4 +105,7 @@ public class RegisterController {
     }
 
     private final DataInterface dataInterface;
+
+    @Autowired
+    private SendEmail emailService;
 }
