@@ -10,16 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import todolist.database.DataInterface;
-import todolist.database.dataType.User;
 import todolist.database.dataType.Token;
+import todolist.database.dataType.User;
 import todolist.jwttoken.JwtToken;
 import todolist.jwttoken.JwtTokenType;
-import todolist.database.mysql.Mysql;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,6 +37,7 @@ public class RegisterController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        dataInterface = InitDataInterface.initDataInterface();
     }
 
     @PostMapping("/register")
@@ -50,7 +49,6 @@ public class RegisterController {
         String lastname = registrationRequest.getLastname();
         String email = registrationRequest.getEmail();
         String password = HashPassword.hashPassword(registrationRequest.getPassword());
-        DataInterface dataInterface = InitDataInterface.initDataInterface();
         User user = new User(0, firstname, lastname, email, password);
         String dataInterfaceResponse = dataInterface.createUser(user);
 
@@ -98,4 +96,6 @@ public class RegisterController {
             throw new IllegalArgumentException("Missing required parameters");
         }
     }
+
+    private final DataInterface dataInterface;
 }
