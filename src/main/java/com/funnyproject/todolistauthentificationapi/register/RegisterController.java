@@ -16,15 +16,33 @@ import todolist.jwttoken.JwtToken;
 import todolist.jwttoken.JwtTokenType;
 import todolist.database.mysql.Mysql;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
 public class RegisterController {
 
+    public RegisterController() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("=");
+                if (System.getProperties().containsKey(parts[0])) {
+                    System.getProperties().setProperty(parts[0], parts[1]);
+                } else {
+                    System.setProperty(parts[0], parts[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegistrationRequest registrationRequest) {
-
         ResponseEntity<String> response = this.checkParameters(registrationRequest);
         if (response != null)
             return response;
@@ -45,13 +63,16 @@ public class RegisterController {
     }
 
     private ResponseEntity<String> createToken(DataInterface dataInterface, String email, String password, String name) {
-        String responseMessage = String.format("{\"message\": \"Email sent to %s\"}", email);
-        int userId = dataInterface.getUser(email, password);
-        String secret = "asdfSFS34wfsdfsdfSDSD32dfsddDDerQSNCK34SOWEK5354fdgdf4";
-        int nbrHour = 24;
-        JwtTokenType token = JwtToken.createJwtToken(secret, name, email, name, nbrHour);
-        Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate(), false);
-        dataInterface.createUserToken(dbToken);
+        final String responseMessage = String.format("{\"message\": \"Email sent to %s\"}", email);
+        final int userId = dataInterface.getUser(email, password);
+        if (userId == -1 || userId == -2)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+        final String secret = System.getProperty("SECRET_TOKEN");
+        final int nbrHour = 24;
+        final JwtTokenType token = JwtToken.createJwtToken(secret, name, email, name, nbrHour);
+        final Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate(), false);
+        if (!dataInterface.createUserToken(dbToken).isEmpty())
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
     }
 
