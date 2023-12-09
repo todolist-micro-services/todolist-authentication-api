@@ -39,6 +39,8 @@ public class ValidationController {
         Token userToken = this.dataInterface.getUserTokenFromToken(token);
         if (userToken == null)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error - can't find token\"}");
+        if (userToken.isActivated)
+            return ResponseEntity.status(HttpStatus.OK).body("{\"account\": \"Already activated\"}");
         userToken.isActivated = true;
         if (!this.dataInterface.updateUserToken(userToken).isEmpty())
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
