@@ -57,7 +57,7 @@ public class RegisterController {
         if (dataInterfaceResponse.isEmpty())
             return this.createToken(dataInterface, email, password, firstname);
         if (dataInterfaceResponse.contains("Duplicate"))
-            return ResponseEntity.status(401).body("{\"error\": \"Email already register\"}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Email already register\"}");
         else
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
     }

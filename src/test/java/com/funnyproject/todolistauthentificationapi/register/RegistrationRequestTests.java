@@ -6,6 +6,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class RegistrationRequestTests {
@@ -21,6 +23,10 @@ class RegistrationRequestTests {
         registrationRequest.setFirstname("firstname");
         registrationRequest.setLastname("lastname");
         registrationRequest.setPassword("password");
+        assertThat(registrationRequest.getEmail()).isEqualTo("email");
+        assertThat(registrationRequest.getPassword()).isEqualTo("password");
+        assertThat(registrationRequest.getLastname()).isEqualTo("lastname");
+        assertThat(registrationRequest.getFirstname()).isEqualTo("firstname");
     }
 
 }
