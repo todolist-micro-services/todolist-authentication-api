@@ -1,5 +1,6 @@
 package com.funnyproject.todolistauthentificationapi.register;
 
+import com.funnyproject.todolistauthentificationapi.AppConfig;
 import com.funnyproject.todolistauthentificationapi.utils.EmailValidator;
 import com.funnyproject.todolistauthentificationapi.utils.HashPassword;
 import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
@@ -17,29 +18,15 @@ import todolist.database.dataType.User;
 import todolist.jwttoken.JwtToken;
 import todolist.jwttoken.JwtTokenType;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/auth")
 public class RegisterController {
 
-    public RegisterController() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("=");
-                if (System.getProperties().containsKey(parts[0])) {
-                    System.getProperties().setProperty(parts[0], parts[1]);
-                } else {
-                    System.setProperty(parts[0], parts[1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        dataInterface = InitDataInterface.initDataInterface();
+    private final AppConfig appConfig;
+
+    public RegisterController(AppConfig appConfig) {
+        this.appConfig = appConfig;
+        dataInterface = InitDataInterface.initDataInterface(appConfig.getDbUrl(), appConfig.getDbUserName(), appConfig.getDbPassword());
     }
 
     @PostMapping("/register")
@@ -67,7 +54,7 @@ public class RegisterController {
         final int userId = dataInterface.getUser(email, password);
         if (userId == -1 || userId == -2)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
-        final String secret = System.getProperty("SECRET_TOKEN");
+        final String secret = appConfig.getToken();
         final int nbrHour = 24;
         final JwtTokenType token = JwtToken.createJwtToken(secret, name, email, name, nbrHour);
         final Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate(), false);

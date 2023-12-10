@@ -1,5 +1,6 @@
 package com.funnyproject.todolistauthentificationapi.validation;
 
+import com.funnyproject.todolistauthentificationapi.AppConfig;
 import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +19,8 @@ import java.io.IOException;
 @RequestMapping("/auth")
 public class ValidationController {
 
-    public ValidationController() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("=");
-                if (System.getProperties().containsKey(parts[0])) {
-                    System.getProperties().setProperty(parts[0], parts[1]);
-                } else {
-                    System.setProperty(parts[0], parts[1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.dataInterface = InitDataInterface.initDataInterface();
+    public ValidationController(AppConfig appConfig) {
+        this.dataInterface = InitDataInterface.initDataInterface(appConfig.getDbUrl(), appConfig.getDbUserName(), appConfig.getDbPassword());
     }
 
     @GetMapping("/validation/{token}")
