@@ -1,5 +1,6 @@
 package com.funnyproject.todolistauthentificationapi.login;
 
+import com.funnyproject.todolistauthentificationapi.AppConfig;
 import com.funnyproject.todolistauthentificationapi.utils.HashPassword;
 import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
 import org.springframework.http.HttpStatus;
@@ -21,21 +22,11 @@ import java.io.IOException;
 @RequestMapping("/auth")
 public class LoginController {
 
-    public LoginController() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("=");
-                if (System.getProperties().containsKey(parts[0])) {
-                    System.getProperties().setProperty(parts[0], parts[1]);
-                } else {
-                    System.setProperty(parts[0], parts[1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        dataInterface = InitDataInterface.initDataInterface();
+    private final AppConfig appConfig;
+
+    public LoginController(AppConfig appConfig) {
+        this.appConfig = appConfig;
+        dataInterface = InitDataInterface.initDataInterface(appConfig.getDbUrl(), appConfig.getDbUserName(), appConfig.getDbPassword());
     }
 
     @PostMapping("/login")
@@ -68,7 +59,7 @@ public class LoginController {
     }
 
     private ResponseEntity<String> generateNewToken(final int userId, final String email) {
-        final String secret = System.getProperty("SECRET_TOKEN");
+        final String secret = appConfig.getToken();
         final int nbrHour = 24;
         final JwtTokenType token1 = JwtToken.createJwtToken(secret, email, email, email, nbrHour);
         final Token token2 = new Token(0, userId, token1.getJwtValue(), token1.getExpirationDate(), true);

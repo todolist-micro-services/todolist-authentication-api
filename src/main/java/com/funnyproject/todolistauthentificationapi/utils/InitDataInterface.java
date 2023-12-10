@@ -5,7 +5,7 @@ import todolist.database.mysql.Mysql;
 
 public class InitDataInterface {
 
-    public static DataInterface initDataInterface() {
-        return new Mysql(System.getProperty("DB_URL"), System.getProperty("DB_USERNAME"), System.getProperty("DB_PASSWORD"));
+    public static DataInterface initDataInterface(String dbUrl, String dbUsername, String dbPassword) {
+        return new Mysql(dbUrl, dbUsername, dbPassword);
     }
 }
