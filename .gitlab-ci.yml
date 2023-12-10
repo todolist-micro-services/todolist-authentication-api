@@ -5,5 +5,13 @@ ci:
         ref: 'master'
         file: 'server/ci.yml'
     strategy: depend
+    variables:
+      SERVER_PORT: 8081
+      DB_URL: jdbc:mysql://localhost:3306/todolistMicroServices
+      DB_USERNAME: root
+      DB_PASSWORD:
+      SECRET_TOKEN: 123456789
+      EMAIL_SENDER: email@email.com
+      EMAIL_PASSWORD: 123456789
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
