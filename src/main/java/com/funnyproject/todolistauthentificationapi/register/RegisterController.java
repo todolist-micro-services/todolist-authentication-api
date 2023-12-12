@@ -7,6 +7,7 @@ import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
 import com.funnyproject.todolistauthentificationapi.utils.SendEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,40 +45,40 @@ public class RegisterController {
         if (dataInterfaceResponse.isEmpty())
             return this.createToken(dataInterface, email, password, firstname);
         if (dataInterfaceResponse.contains("Duplicate"))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Email already register\"}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Email already register\"}");
         else
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Internal server error\"}");
     }
 
     private ResponseEntity<String> createToken(DataInterface dataInterface, String email, String password, String name) {
         final String responseMessage = String.format("{\"message\": \"Email sent to %s\"}", email);
         final int userId = dataInterface.getUser(email, password);
         if (userId == -1 || userId == -2)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Internal server error\"}");
         final String secret = appConfig.getToken();
         final int nbrHour = 24;
         final JwtTokenType token = JwtToken.createJwtToken(secret, name, email, name, nbrHour);
         final Token dbToken = new Token(0, userId, token.getJwtValue(), token.getExpirationDate(), false);
         if (!dataInterface.createUserToken(dbToken).isEmpty())
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Internal server error\"}");
         try {
             emailService.sendEmail(email, "Account validation - todolist-micro-service", "http://localhost:8081/auth/validation/" + token.getJwtValue());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error - cannot send email\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Internal server error - cannot send email\"}");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(responseMessage);
     }
 
     private ResponseEntity<String> checkParameters(RegistrationRequest registrationRequest) {
         try {
             validateRegistrationRequest(registrationRequest);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("{\"error\": \"Missing parameters, needs : firstname, lastname, email, password\"}");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Missing parameters, needs : firstname, lastname, email, password\"}");
         }
 
         String email = registrationRequest.getEmail();
         if (!EmailValidator.isValidEmail(email))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"Bad email form\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Bad email form\"}");
         return null;
     }
 

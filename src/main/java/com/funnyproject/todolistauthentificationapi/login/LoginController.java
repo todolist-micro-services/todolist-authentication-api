@@ -4,6 +4,7 @@ import com.funnyproject.todolistauthentificationapi.AppConfig;
 import com.funnyproject.todolistauthentificationapi.utils.HashPassword;
 import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,23 +31,25 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> register(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         try {
             validateLoginRequest(loginRequest);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("{\"error\": \"Missing parameters, needs : email, password\"}");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Missing parameters, needs : email, password\"}");
         }
         final String email = loginRequest.getEmail();
         final String password = HashPassword.hashPassword(loginRequest.getPassword());
         final int userId = dataInterface.getUser(email, password);
 
         if (userId == -1)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"User not found with these credentials\"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"User not found with these credentials\"}");
         if (userId == -2)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Internal server error\"}");
         final Token token = dataInterface.getUserToken(userId);
+        if (token == null)
+            return generateNewToken(userId, email);
         if (!token.isActivated)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You must activate your account with the link send to your email\"}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"You must activate your account with the link send to your email\"}");
         return generateNewToken(userId, email);
     }
 
@@ -66,9 +69,9 @@ public class LoginController {
         String responseMessage = "";
 
         if (!dataInterface.deleteUserToken(userId).isEmpty() || !dataInterface.createUserToken(token2).isEmpty())
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Internal server error\"}");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body("{\"error\": \"Internal server error\"}");
         responseMessage = String.format("{\"token\": \"%s\", \"expiration\": \"%s\"}", token2.jwtValue, token2.expirationDate.toString());
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(responseMessage);
     }
 
     private final DataInterface dataInterface;
