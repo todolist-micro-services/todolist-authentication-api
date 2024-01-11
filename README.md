@@ -1,3 +1,7 @@
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
+
 ![pipeline](https://gitlab.com/todolist-micro-services/todolist-authentification-api/badges/master/pipeline.svg)
 
 # todolist-authentification-api
@@ -18,21 +22,10 @@ Gradle = 8.5.0
 gradle build
 ```
 
-## config
-
-add ```application.properties``` in ```src/main/resources``` with this content:
-
-```properties
-SERVER_PORT=
-DB_URL=
-DB_USERNAME=
-DB_PASSWORD=
-```
-
 ## run
 
 ```bash
-./gradlew bootRun # -> curl localhost:8080
+./gradlew bootRun # -> curl localhost:{port in .env}
 ```
 
 ## test
