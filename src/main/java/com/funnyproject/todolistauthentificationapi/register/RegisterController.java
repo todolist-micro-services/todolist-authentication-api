@@ -1,10 +1,7 @@
 package com.funnyproject.todolistauthentificationapi.register;
 
 import com.funnyproject.todolistauthentificationapi.AppConfig;
-import com.funnyproject.todolistauthentificationapi.utils.EmailValidator;
-import com.funnyproject.todolistauthentificationapi.utils.HashPassword;
-import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
-import com.funnyproject.todolistauthentificationapi.utils.SendEmail;
+import com.funnyproject.todolistauthentificationapi.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import todolist.database.DataInterface;
 import todolist.database.dataType.Token;
 import todolist.database.dataType.User;
-import todolist.jwttoken.JwtToken;
-import todolist.jwttoken.JwtTokenType;
 
 @RestController
 @RequestMapping("/auth")

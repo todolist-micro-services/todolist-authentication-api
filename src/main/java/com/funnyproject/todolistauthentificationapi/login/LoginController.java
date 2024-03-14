@@ -3,6 +3,8 @@ package com.funnyproject.todolistauthentificationapi.login;
 import com.funnyproject.todolistauthentificationapi.AppConfig;
 import com.funnyproject.todolistauthentificationapi.utils.HashPassword;
 import com.funnyproject.todolistauthentificationapi.utils.InitDataInterface;
+import com.funnyproject.todolistauthentificationapi.utils.JwtToken;
+import com.funnyproject.todolistauthentificationapi.utils.JwtTokenType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import todolist.database.DataInterface;
 import todolist.database.dataType.Token;
-import todolist.jwttoken.JwtToken;
-import todolist.jwttoken.JwtTokenType;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
